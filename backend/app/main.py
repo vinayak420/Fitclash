@@ -18,11 +18,7 @@ origins = [
 
 app.add_middleware(
     CORSMiddleware,
-<<<<<<< HEAD
-    allow_origins=origins,  # for local development; restrict this in production
-=======
     allow_origins=origins,
->>>>>>> 8022478a0535721091a51a8dc112a6831f8563ab
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

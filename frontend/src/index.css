@@ -1,0 +1,142 @@
+@import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --ink: #171514;
+  --ink-2: #1D1A18;
+  --ink-3: #242019;
+  --chalk: #F2EEE6;
+  --chalk-dim: #B7B0A2;
+  --signal: #E8B923;
+  --ember: #E8542F;
+  --turf: #4F8B5A;
+  --steel: #3A3733;
+  --steel-2: #2A2724;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  background: var(--ink);
+  color: var(--chalk);
+}
+
+.fc-display { font-family: 'Anton', sans-serif; letter-spacing: 0.01em; }
+.fc-mono { font-family: 'IBM Plex Mono', monospace; }
+.fc-bg-ink2 { background: var(--ink-2); }
+.fc-bg-ink3 { background: var(--ink-3); }
+.fc-border { border-color: var(--steel); }
+.fc-text-dim { color: var(--chalk-dim); }
+.fc-signal { color: var(--signal); }
+.fc-bg-signal { background: var(--signal); }
+.fc-ember { color: var(--ember); }
+.fc-bg-ember { background: var(--ember); }
+.fc-turf { color: var(--turf); }
+.fc-bg-turf { background: var(--turf); }
+
+.fc-btn-primary {
+  background: var(--signal);
+  color: var(--ink);
+  font-weight: 700;
+  transition: transform 0.12s ease, filter 0.12s ease;
+}
+.fc-btn-primary:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.fc-btn-primary:active { transform: translateY(0); }
+.fc-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+.fc-btn-ghost {
+  background: transparent;
+  border: 1px solid var(--steel);
+  color: var(--chalk);
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+.fc-btn-ghost:hover { border-color: var(--chalk-dim); background: var(--ink-3); }
+
+.fc-card {
+  background: var(--ink-2);
+  border: 1px solid var(--steel);
+  border-radius: 14px;
+}
+
+.fc-item-tile {
+  background: var(--ink-2);
+  border: 1.5px dashed var(--steel);
+  border-radius: 12px;
+  transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
+  position: relative;
+}
+.fc-item-tile:hover { border-color: var(--chalk-dim); }
+.fc-item-tile.checked {
+  border-style: solid;
+  border-color: var(--turf);
+  background: rgba(79, 139, 90, 0.12);
+}
+.fc-item-tile:active { transform: scale(0.99); }
+.fc-item-tile:disabled { cursor: default; }
+
+.fc-rank-1 { color: var(--signal); }
+.fc-rank-2 { color: var(--chalk); }
+.fc-rank-3 { color: var(--ember); }
+
+.fc-input {
+  background: var(--ink-3);
+  border: 1px solid var(--steel);
+  color: var(--chalk);
+  border-radius: 8px;
+  outline: none;
+}
+.fc-input:focus { border-color: var(--signal); }
+.fc-input::placeholder { color: var(--chalk-dim); }
+
+.fc-tab {
+  color: var(--chalk-dim);
+  border-bottom: 2px solid transparent;
+  transition: color 0.12s ease, border-color 0.12s ease;
+  background: transparent;
+}
+.fc-tab.active { color: var(--chalk); border-color: var(--signal); }
+.fc-tab:hover { color: var(--chalk); }
+
+.fc-chip {
+  border: 1px solid var(--steel);
+  color: var(--chalk-dim);
+  transition: all 0.12s ease;
+  background: transparent;
+}
+.fc-chip.active {
+  border-color: var(--signal);
+  color: var(--ink);
+  background: var(--signal);
+  font-weight: 700;
+}
+
+.fc-modal-overlay {
+  background: rgba(10, 9, 8, 0.7);
+  backdrop-filter: blur(2px);
+}
+
+.fc-scroll::-webkit-scrollbar { width: 8px; height: 8px; }
+.fc-scroll::-webkit-scrollbar-thumb { background: var(--steel); border-radius: 8px; }
+
+.fc-flame-pulse { animation: fc-pulse 2s ease-in-out infinite; }
+@keyframes fc-pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.12); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fc-flame-pulse { animation: none; }
+  .fc-btn-primary:hover { transform: none; }
+}
+
+.fc-focus:focus-visible {
+  outline: 2px solid var(--signal);
+  outline-offset: 2px;
+}

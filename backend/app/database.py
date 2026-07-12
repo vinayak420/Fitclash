@@ -17,3 +17,5 @@ def get_db():
         yield db
     finally:
         db.close()
+
+print("DATABASE_URL:", DATABASE_URL)

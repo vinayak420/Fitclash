@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import PasswordInput from '../components/PasswordInput';
 
 export default function LoginPage() {
   const { login } = useAuth();
@@ -48,13 +49,12 @@ export default function LoginPage() {
           </div>
           <div>
             <label className="text-xs fc-text-dim uppercase tracking-wide">Password</label>
-            <input
-              type="password"
+            <PasswordInput
               required
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
+              onChange={setPassword}
               placeholder="••••••••"
-              className="fc-input fc-focus w-full mt-1 px-3 py-2.5"
+              autoComplete="current-password"
             />
             <div className="text-right mt-1">
               <Link to="/forgot-password" className="text-xs fc-text-dim hover:fc-signal">Forgot password?</Link>

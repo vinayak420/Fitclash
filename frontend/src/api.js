@@ -52,7 +52,7 @@ export const api = {
   forgotPassword: (email) => request('POST', '/auth/forgot-password', { email }),
   resetPassword: (token, new_password) => request('POST', '/auth/reset-password', { token, new_password }),
 
-  createGroup: (name, endDate) => request('POST', '/groups', { name, end_date: endDate || null }),
+  createGroup: (name) => request('POST', '/groups', { name }),
   joinGroup: (invite_code) => request('POST', '/groups/join', { invite_code }),
   myGroups: () => request('GET', '/groups/mine'),
   getGroup: (groupId) => request('GET', `/groups/${groupId}`),

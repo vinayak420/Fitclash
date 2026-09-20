@@ -1,13 +1,8 @@
 import React, { useState } from 'react';
 import Modal from './Modal';
 
-function todayStr() {
-  return new Date().toISOString().slice(0, 10);
-}
-
 export default function CreateGroupModal({ onClose, onCreate }) {
   const [name, setName] = useState('');
-  const [endDate, setEndDate] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
 
@@ -17,7 +12,7 @@ export default function CreateGroupModal({ onClose, onCreate }) {
     setBusy(true);
     setError('');
     try {
-      await onCreate(name.trim(), endDate || null);
+      await onCreate(name.trim());
     } catch (err) {
       setError(err.message);
       setBusy(false);
@@ -25,10 +20,10 @@ export default function CreateGroupModal({ onClose, onCreate }) {
   }
 
   return (
-    <Modal title="Create a group" onClose={onClose}>
+    <Modal title="Create a community" onClose={onClose}>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
-          <label className="text-xs fc-text-dim uppercase tracking-wide">Group name</label>
+          <label className="text-xs fc-text-dim uppercase tracking-wide">Community name</label>
           <input
             autoFocus
             value={name}
@@ -38,34 +33,12 @@ export default function CreateGroupModal({ onClose, onCreate }) {
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-3">
-          <div>
-            <label className="text-xs fc-text-dim uppercase tracking-wide">Start date</label>
-            <input
-              disabled
-              value={todayStr()}
-              className="fc-input w-full mt-1 px-3 py-2.5 opacity-60"
-            />
-          </div>
-          <div>
-            <label className="text-xs fc-text-dim uppercase tracking-wide">End date (optional)</label>
-            <input
-              type="date"
-              min={todayStr()}
-              value={endDate}
-              onChange={(e) => setEndDate(e.target.value)}
-              className="fc-input fc-focus w-full mt-1 px-3 py-2.5"
-            />
-          </div>
-        </div>
-
         <p className="text-xs fc-text-dim">
-          Leave the end date blank to run the challenge indefinitely — you can end it anytime from Manage.
-          You'll be the admin, with a starter checklist you can edit anytime.
+          You'll be the admin. No challenge is created yet — start one from this community when you're ready.
         </p>
         {error && <p className="text-sm fc-ember">{error}</p>}
         <button type="submit" disabled={!name.trim() || busy} className="fc-btn-primary fc-focus rounded-lg py-2.5 font-display">
-          {busy ? 'CREATING…' : 'CREATE GROUP'}
+          {busy ? 'CREATING…' : 'CREATE COMMUNITY'}
         </button>
       </form>
     </Modal>

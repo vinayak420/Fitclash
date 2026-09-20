@@ -79,13 +79,13 @@ export default function DashboardPage() {
     return () => clearTimeout(t);
   }, [toast]);
 
-  async function handleCreateGroup(name, endDate) {
-    const group = await api.createGroup(name, endDate);
+  async function handleCreateGroup(name) {
+    const group = await api.createGroup(name);
     await refreshGroups();
     setSelectedGroupId(group.id);
     setActiveTab('today');
     setShowCreate(false);
-    notify(`Group "${group.name}" created`);
+    notify(`Community "${group.name}" created`);
   }
 
   async function handleJoinGroup(code) {

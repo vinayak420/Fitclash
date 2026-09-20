@@ -36,6 +36,24 @@ export default function GroupView({
         </button>
       </div>
 
+      {!group.challenge && (
+        <div className="fc-bg-ink3 rounded-lg p-4 mb-5">
+          <div className="text-xs fc-signal uppercase tracking-wide mb-1">Active challenge</div>
+          <p className="text-sm fc-text-dim mb-3">No active challenge in this community.</p>
+          {isAdmin ? (
+            <button
+              type="button"
+              onClick={() => setActiveTab('manage')}
+              className="fc-btn-primary fc-focus rounded-lg px-4 py-2 text-sm"
+            >
+              Create Challenge
+            </button>
+          ) : (
+            <p className="text-xs fc-text-dim">Ask the community admin to create one.</p>
+          )}
+        </div>
+      )}
+
       <div className="flex gap-5 border-b mb-5 overflow-x-auto fc-scroll" style={{ borderColor: 'var(--steel)' }}>
         {tabs.map((t) => (
           <button

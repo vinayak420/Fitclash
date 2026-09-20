@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { CheckCircle2 } from 'lucide-react';
 import { api } from '../api';
+import PasswordInput from '../components/PasswordInput';
 
 export default function ResetPasswordPage() {
   const [searchParams] = useSearchParams();
@@ -67,27 +68,25 @@ export default function ResetPasswordPage() {
             )}
             <div>
               <label className="text-xs fc-text-dim uppercase tracking-wide">New password</label>
-              <input
-                type="password"
+              <PasswordInput
                 autoFocus
                 required
                 minLength={6}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={setPassword}
                 placeholder="At least 6 characters"
-                className="fc-input fc-focus w-full mt-1 px-3 py-2.5"
+                autoComplete="new-password"
               />
             </div>
             <div>
               <label className="text-xs fc-text-dim uppercase tracking-wide">Confirm password</label>
-              <input
-                type="password"
+              <PasswordInput
                 required
                 minLength={6}
                 value={confirm}
-                onChange={(e) => setConfirm(e.target.value)}
+                onChange={setConfirm}
                 placeholder="Re-enter password"
-                className="fc-input fc-focus w-full mt-1 px-3 py-2.5"
+                autoComplete="new-password"
               />
             </div>
             {error && <p className="text-sm fc-ember">{error}</p>}

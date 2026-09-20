@@ -9,13 +9,6 @@ from ..deps import get_current_user, get_membership_or_404, require_admin
 
 router = APIRouter(prefix="/groups", tags=["groups"])
 
-DEFAULT_ITEMS = [
-    ("Move for 30 minutes", 10),
-    ("Drink 8 glasses of water", 5),
-    ("Sleep 7+ hours", 10),
-    ("No sugary drinks", 5),
-]
-
 
 def _get_active_challenge(db: Session, group_id: int):
     return (
@@ -61,11 +54,6 @@ def _challenge_summary(db: Session, challenge: models.Challenge) -> schemas.Chal
     )
 
 
-def _seed_default_items(db: Session, challenge: models.Challenge) -> None:
-    for name, points in DEFAULT_ITEMS:
-        db.add(models.ChallengeItem(challenge_id=challenge.id, name=name, points=points))
-
-
 def _group_detail(db: Session, group: models.Group) -> schemas.GroupDetail:
     members = (
         db.query(models.GroupMember, models.User)
@@ -100,23 +88,13 @@ def create_group(
     db: Session = Depends(get_db),
     current_user: models.User = Depends(get_current_user),
 ):
-    if payload.end_date and payload.end_date < date.today():
-        raise HTTPException(status_code=400, detail="End date cannot be in the past")
-
+    """Create a group only. Challenges are started later via POST /groups/{id}/challenge/start."""
     group = models.Group(name=payload.name.strip(), admin_id=current_user.id)
     db.add(group)
     db.flush()
 
     membership = models.GroupMember(group_id=group.id, user_id=current_user.id, role=models.RoleEnum.ADMIN)
     db.add(membership)
-
-    challenge = models.Challenge(
-        group_id=group.id, name="Daily Basics", start_date=date.today(),
-        end_date=payload.end_date, is_active=True,
-    )
-    db.add(challenge)
-    db.flush()
-    _seed_default_items(db, challenge)
 
     db.commit()
     db.refresh(group)
@@ -187,6 +165,23 @@ def get_group(
     group = db.query(models.Group).filter(models.Group.id == group_id).first()
     if not group:
         raise HTTPException(status_code=404, detail="Group not found")
+    return _group_detail(db, group)
+
+
+@router.put("/{group_id}", response_model=schemas.GroupDetail)
+def rename_group(
+    group_id: int,
+    payload: schemas.GroupRename,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    require_admin(db, group_id, current_user.id)
+    group = db.query(models.Group).filter(models.Group.id == group_id).first()
+    if not group:
+        raise HTTPException(status_code=404, detail="Group not found")
+    group.name = payload.name.strip()
+    db.commit()
+    db.refresh(group)
     return _group_detail(db, group)
 
 
@@ -301,13 +296,15 @@ def start_challenge(
     if existing:
         raise HTTPException(status_code=400, detail="There's already an active challenge — end it first")
 
+    name = payload.name.strip()
+    if not name:
+        raise HTTPException(status_code=400, detail="Challenge name is required")
+
     challenge = models.Challenge(
-        group_id=group_id, name=payload.name.strip() or "Daily Basics", start_date=date.today(),
+        group_id=group_id, name=name, start_date=date.today(),
         end_date=payload.end_date, is_active=True,
     )
     db.add(challenge)
-    db.flush()
-    _seed_default_items(db, challenge)
     db.commit()
     db.refresh(challenge)
     return _challenge_out(challenge)

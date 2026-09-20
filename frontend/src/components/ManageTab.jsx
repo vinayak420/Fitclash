@@ -33,7 +33,7 @@ function LastChallengeSummary({ challenge }) {
 }
 
 function StartChallengeForm({ group, onChanged }) {
-  const [name, setName] = useState('Daily Basics');
+  const [name, setName] = useState('');
   const [endDate, setEndDate] = useState('');
   const [error, setError] = useState('');
   const [busy, setBusy] = useState(false);
@@ -64,6 +64,7 @@ function StartChallengeForm({ group, onChanged }) {
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
+            placeholder="e.g. Daily Basics"
             className="fc-input fc-focus w-full mt-1 px-3 py-2"
           />
         </div>

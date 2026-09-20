@@ -14,6 +14,10 @@ export default function TodayTab({ group, onChanged, notify }) {
 
   useEffect(() => {
     let mounted = true;
+    if (!group.challenge) {
+      setTodaySub(null);
+      return () => { mounted = false; };
+    }
     setTodaySub(undefined);
     setChecked(new Set());
     api.getTodaySubmission(group.id).then((sub) => {
@@ -22,7 +26,15 @@ export default function TodayTab({ group, onChanged, notify }) {
       if (mounted) setTodaySub(null);
     });
     return () => { mounted = false; };
-  }, [group.id]);
+  }, [group.id, group.challenge]);
+
+  if (!group.challenge) {
+    return (
+      <div className="py-6 text-center">
+        <p className="fc-text-dim text-sm mb-3">This community has no active challenge yet.</p>
+      </div>
+    );
+  }
 
   const items = group.challenge ? group.challenge.items : [];
   const isLocked = !!todaySub;
@@ -60,16 +72,8 @@ export default function TodayTab({ group, onChanged, notify }) {
     return <div className="fc-text-dim text-sm py-6 text-center">Loading today's checklist…</div>;
   }
 
-  if (!group.challenge) {
-    return (
-      <div className="fc-text-dim text-sm py-6 text-center">
-        This group has no active challenge right now. Ask the group admin to start a new one from the Manage tab.
-      </div>
-    );
-  }
-
   if (items.length === 0) {
-    return <div className="fc-text-dim text-sm py-6 text-center">This group's admin hasn't added checklist items yet.</div>;
+    return <div className="fc-text-dim text-sm py-6 text-center">This community's admin hasn't added checklist items yet.</div>;
   }
 
   return (

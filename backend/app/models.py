@@ -91,7 +91,7 @@ class Challenge(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     group_id = Column(Integer, ForeignKey("groups.id"), nullable=False)
-    name = Column(String(150), nullable=False, default="Daily Basics")
+    name = Column(String(150), nullable=False)
     start_date = Column(Date, default=date.today, nullable=False)
     end_date = Column(Date, nullable=True)  # null = indefinite / not yet ended
     is_active = Column(Boolean, default=True, nullable=False)

@@ -86,7 +86,7 @@ class ChallengeRename(BaseModel):
 
 
 class ChallengeStartRequest(BaseModel):
-    name: str = Field(min_length=1, max_length=150, default="Daily Basics")
+    name: str = Field(min_length=1, max_length=150)
     end_date: Optional[date] = None
 
 
@@ -122,6 +122,10 @@ class GroupCreate(BaseModel):
     end_date: Optional[date] = None
 
 
+class GroupRename(BaseModel):
+    name: str = Field(min_length=1, max_length=150)
+
+
 class GroupJoin(BaseModel):
     invite_code: str = Field(min_length=1, max_length=12)
 
@@ -152,7 +156,7 @@ class GroupDetail(BaseModel):
     invite_code: str
     admin_id: int
     members: List[MemberOut]
-    challenge: Optional[ChallengeOut]
+    challenge: Optional[ChallengeOut] = None
     last_completed_challenge: Optional[ChallengeSummary] = None
 
     class Config:

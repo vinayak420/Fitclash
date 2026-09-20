@@ -1,20 +1,22 @@
-@import url('https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 :root {
-  --ink: #171514;
-  --ink-2: #1D1A18;
-  --ink-3: #242019;
-  --chalk: #F2EEE6;
-  --chalk-dim: #B7B0A2;
-  --signal: #E8B923;
-  --ember: #E8542F;
-  --turf: #4F8B5A;
-  --steel: #3A3733;
-  --steel-2: #2A2724;
+  --ink: #EEEDF8;
+  --ink-2: #FFFFFF;
+  --ink-3: #F4F2FB;
+  --chalk: #2A2748;
+  --chalk-dim: #9A96B0;
+  --signal: #7C5CFF;
+  --signal-soft: #EDE8FF;
+  --on-primary: #FFFFFF;
+  --ember: #FF6B8A;
+  --turf: #4ECDC4;
+  --steel: #E8E4F4;
+  --steel-2: #D9D4EC;
 }
 
 html, body, #root {
@@ -23,12 +25,12 @@ html, body, #root {
 
 body {
   margin: 0;
-  font-family: 'Inter', sans-serif;
+  font-family: 'Poppins', sans-serif;
   background: var(--ink);
   color: var(--chalk);
 }
 
-.fc-display { font-family: 'Anton', sans-serif; letter-spacing: 0.01em; }
+.fc-display { font-family: 'Poppins', sans-serif; font-weight: 700; letter-spacing: -0.02em; }
 .fc-mono { font-family: 'IBM Plex Mono', monospace; }
 .fc-bg-ink2 { background: var(--ink-2); }
 .fc-bg-ink3 { background: var(--ink-3); }
@@ -43,11 +45,12 @@ body {
 
 .fc-btn-primary {
   background: var(--signal);
-  color: var(--ink);
-  font-weight: 700;
+  color: var(--on-primary);
+  font-weight: 600;
+  border-radius: 999px;
   transition: transform 0.12s ease, filter 0.12s ease;
 }
-.fc-btn-primary:hover { filter: brightness(1.08); transform: translateY(-1px); }
+.fc-btn-primary:hover { filter: brightness(1.06); transform: translateY(-1px); }
 .fc-btn-primary:active { transform: translateY(0); }
 .fc-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
 
@@ -55,28 +58,30 @@ body {
   background: transparent;
   border: 1px solid var(--steel);
   color: var(--chalk);
+  border-radius: 999px;
   transition: border-color 0.12s ease, background 0.12s ease;
 }
-.fc-btn-ghost:hover { border-color: var(--chalk-dim); background: var(--ink-3); }
+.fc-btn-ghost:hover { border-color: var(--signal); background: var(--signal-soft); }
 
 .fc-card {
   background: var(--ink-2);
-  border: 1px solid var(--steel);
-  border-radius: 14px;
+  border: none;
+  border-radius: 20px;
+  box-shadow: 0 1px 3px rgba(42, 39, 72, 0.06);
 }
 
 .fc-item-tile {
   background: var(--ink-2);
-  border: 1.5px dashed var(--steel);
-  border-radius: 12px;
+  border: 1px solid var(--steel);
+  border-radius: 14px;
   transition: border-color 0.15s ease, background 0.15s ease, transform 0.1s ease;
   position: relative;
 }
-.fc-item-tile:hover { border-color: var(--chalk-dim); }
+.fc-item-tile:hover { border-color: var(--signal); }
 .fc-item-tile.checked {
   border-style: solid;
   border-color: var(--turf);
-  background: rgba(79, 139, 90, 0.12);
+  background: rgba(78, 205, 196, 0.12);
 }
 .fc-item-tile:active { transform: scale(0.99); }
 .fc-item-tile:disabled { cursor: default; }
@@ -89,11 +94,15 @@ body {
   background: var(--ink-3);
   border: 1px solid var(--steel);
   color: var(--chalk);
-  border-radius: 8px;
+  border-radius: 999px;
   outline: none;
 }
 .fc-input:focus { border-color: var(--signal); }
 .fc-input::placeholder { color: var(--chalk-dim); }
+.fc-input[type="date"],
+.fc-input[type="number"] {
+  border-radius: 14px;
+}
 
 .fc-tab {
   color: var(--chalk-dim);
@@ -101,8 +110,8 @@ body {
   transition: color 0.12s ease, border-color 0.12s ease;
   background: transparent;
 }
-.fc-tab.active { color: var(--chalk); border-color: var(--signal); }
-.fc-tab:hover { color: var(--chalk); }
+.fc-tab.active { color: var(--signal); border-color: var(--signal); font-weight: 600; }
+.fc-tab:hover { color: var(--signal); }
 
 .fc-chip {
   border: 1px solid var(--steel);
@@ -112,13 +121,25 @@ body {
 }
 .fc-chip.active {
   border-color: var(--signal);
-  color: var(--ink);
+  color: var(--on-primary);
   background: var(--signal);
-  font-weight: 700;
+  font-weight: 600;
+}
+
+.fc-invite-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--signal-soft);
+  color: var(--signal);
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-family: 'IBM Plex Mono', monospace;
+  font-size: 12px;
 }
 
 .fc-modal-overlay {
-  background: rgba(10, 9, 8, 0.7);
+  background: rgba(42, 39, 72, 0.35);
   backdrop-filter: blur(2px);
 }
 

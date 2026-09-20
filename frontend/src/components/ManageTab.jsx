@@ -7,29 +7,8 @@ function todayStr() {
 }
 
 function formatDate(d) {
-  if (!d) return 'Indefinite';
+  if (!d) return 'Open-ended';
   return new Date(d + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
-}
-
-function LastChallengeSummary({ challenge }) {
-  if (!challenge) return null;
-  return (
-    <div className="fc-bg-ink3 rounded-lg p-4">
-      <div className="text-xs fc-text-dim uppercase tracking-wide mb-1">Previous challenge</div>
-      <div className="font-semibold text-sm mb-1">{challenge.name}</div>
-      <div className="fc-text-dim text-xs mb-2">
-        {formatDate(challenge.start_date)} – {formatDate(challenge.end_date)}
-      </div>
-      {challenge.winners.length > 0 ? (
-        <div className="flex items-center gap-2 text-sm fc-signal">
-          <Trophy size={15} />
-          {challenge.winners.map((w) => w.name).join(', ')} won with {challenge.winners[0].points} pts
-        </div>
-      ) : (
-        <div className="text-xs fc-text-dim">No points were logged during this challenge.</div>
-      )}
-    </div>
-  );
 }
 
 function StartChallengeForm({ group, onChanged }) {
@@ -93,7 +72,7 @@ function StartChallengeForm({ group, onChanged }) {
   );
 }
 
-function DeleteGroupSection({ group, onDeleted }) {
+export function DeleteCommunitySection({ group, onDeleted }) {
   const [confirming, setConfirming] = useState(false);
   const [confirmText, setConfirmText] = useState('');
   const [busy, setBusy] = useState(false);
@@ -126,8 +105,9 @@ function DeleteGroupSection({ group, onDeleted }) {
       ) : (
         <div className="fc-bg-ink3 rounded-lg p-4">
           <p className="text-sm mb-3">
-            This permanently deletes <span className="font-semibold">{group.name}</span> — all members,
-            challenge history, check-ins, and points. This cannot be undone. Type the community name to confirm.
+            This permanently deletes the community <span className="font-semibold">{group.name}</span> — all
+            members, challenge history, check-ins, and points. This is not the same as ending a challenge, and it cannot be undone.
+            Type the community name to confirm.
           </p>
           <input
             value={confirmText}
@@ -140,7 +120,7 @@ function DeleteGroupSection({ group, onDeleted }) {
               onClick={handleDelete}
               disabled={busy || confirmText !== group.name}
               className="rounded-lg px-4 py-2 text-sm font-semibold disabled:opacity-50"
-              style={{ background: 'var(--ember)', color: 'var(--ink)' }}
+              style={{ background: 'var(--ember)', color: 'var(--on-primary)' }}
             >
               {busy ? 'DELETING…' : 'Yes, delete permanently'}
             </button>
@@ -157,7 +137,7 @@ function DeleteGroupSection({ group, onDeleted }) {
   );
 }
 
-export default function ManageTab({ group, onChanged, onDeleted }) {
+export default function ManageTab({ group, onChanged }) {
   const challenge = group.challenge;
   const [name, setName] = useState(challenge ? challenge.name : '');
   const [newItemName, setNewItemName] = useState('');
@@ -231,9 +211,7 @@ export default function ManageTab({ group, onChanged, onDeleted }) {
       <div className="flex flex-col gap-4">
         {error && <p className="text-sm fc-ember">{error}</p>}
         {endResult && <EndResultBanner result={endResult} />}
-        <LastChallengeSummary challenge={group.last_completed_challenge} />
         <StartChallengeForm group={group} onChanged={onChanged} />
-        <DeleteGroupSection group={group} onDeleted={onDeleted} />
       </div>
     );
   }
@@ -329,7 +307,7 @@ export default function ManageTab({ group, onChanged, onDeleted }) {
                 onClick={handleEndChallenge}
                 disabled={busy}
                 className="rounded-lg px-4 py-2 text-sm font-semibold"
-                style={{ background: 'var(--ember)', color: 'var(--ink)' }}
+                style={{ background: 'var(--ember)', color: 'var(--on-primary)' }}
               >
                 {busy ? 'ENDING…' : 'Yes, end it'}
               </button>
@@ -340,8 +318,6 @@ export default function ManageTab({ group, onChanged, onDeleted }) {
           </div>
         )}
       </div>
-
-      <DeleteGroupSection group={group} onDeleted={onDeleted} />
     </div>
   );
 }

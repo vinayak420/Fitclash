@@ -7,7 +7,7 @@ export default function Modal({ title, onClose, children }) {
       <div className="fc-card w-full max-w-md p-6" onClick={(e) => e.stopPropagation()}>
         <div className="flex items-center justify-between mb-4">
           <h3 className="fc-display text-xl">{title}</h3>
-          <button onClick={onClose} className="fc-text-dim hover:text-white fc-focus" aria-label="Close">
+          <button onClick={onClose} className="fc-text-dim hover:text-signal fc-focus" aria-label="Close">
             <X size={20} />
           </button>
         </div>

@@ -117,9 +117,9 @@ export default function TodayTab({ group, onChanged, notify }) {
         <button
           onClick={handleSubmit}
           disabled={checked.size === 0 || submitting}
-          className="fc-btn-primary fc-focus rounded-lg px-5 py-2.5 font-display w-full sm:w-auto"
+          className="fc-btn-primary fc-focus px-5 py-2.5 w-full sm:w-auto"
         >
-          {submitting ? 'SUBMITTING…' : 'SUBMIT CHECK-IN'}
+          {submitting ? 'Submitting…' : 'Check in'}
         </button>
       )}
     </div>

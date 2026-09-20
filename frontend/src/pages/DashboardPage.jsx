@@ -15,7 +15,8 @@ export default function DashboardPage() {
   const [groups, setGroups] = useState([]);
   const [selectedGroup, setSelectedGroup] = useState(null);
   const [selectedGroupId, setSelectedGroupId] = useState(null);
-  const [activeTab, setActiveTab] = useState('today');
+  const [topTab, setTopTab] = useState('challenge');
+  const [challengeTab, setChallengeTab] = useState('today');
   const [stats, setStats] = useState(null);
   const [showCreate, setShowCreate] = useState(false);
   const [showJoin, setShowJoin] = useState(false);
@@ -83,7 +84,8 @@ export default function DashboardPage() {
     const group = await api.createGroup(name);
     await refreshGroups();
     setSelectedGroupId(group.id);
-    setActiveTab('today');
+    setTopTab('challenge');
+    setChallengeTab('manage');
     setShowCreate(false);
     notify(`Community "${group.name}" created`);
   }
@@ -92,7 +94,8 @@ export default function DashboardPage() {
     const group = await api.joinGroup(code);
     await refreshGroups();
     setSelectedGroupId(group.id);
-    setActiveTab('today');
+    setTopTab('challenge');
+    setChallengeTab('today');
     setShowJoin(false);
     notify(`Joined "${group.name}"`);
   }
@@ -131,7 +134,7 @@ export default function DashboardPage() {
               <Avatar name={user.name} size={44} />
               <div className="min-w-0">
                 <div className="font-semibold truncate">{user.name}</div>
-                <button onClick={logout} className="fc-text-dim text-xs flex items-center gap-1 hover:text-white fc-focus">
+                <button onClick={logout} className="fc-text-dim text-xs flex items-center gap-1 hover:text-signal fc-focus">
                   <LogOut size={12} /> Sign out
                 </button>
               </div>
@@ -171,7 +174,7 @@ export default function DashboardPage() {
               {groups.map((g) => (
                 <button
                   key={g.id}
-                  onClick={() => { setSelectedGroupId(g.id); setActiveTab('today'); }}
+                  onClick={() => { setSelectedGroupId(g.id); setTopTab('challenge'); setChallengeTab('today'); }}
                   className={`fc-focus flex items-center justify-between px-3 py-2 rounded-lg text-left transition-colors ${
                     selectedGroupId === g.id ? 'fc-bg-ink3' : 'hover:fc-bg-ink3'
                   }`}
@@ -207,8 +210,10 @@ export default function DashboardPage() {
             <GroupView
               group={selectedGroup}
               currentUserId={user.id}
-              activeTab={activeTab}
-              setActiveTab={setActiveTab}
+              topTab={topTab}
+              setTopTab={setTopTab}
+              challengeTab={challengeTab}
+              setChallengeTab={setChallengeTab}
               onChanged={handleGroupChanged}
               onDeleted={handleGroupDeleted}
               notify={notify}

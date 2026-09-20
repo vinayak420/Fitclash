@@ -108,7 +108,7 @@ export default function DashboardPage() {
     const list = await refreshGroups();
     setSelectedGroupId(list.length > 0 ? list[0].id : null);
     await refreshStats();
-    notify('Group deleted');
+    notify('Community deleted');
   }
 
   return (
@@ -162,11 +162,11 @@ export default function DashboardPage() {
           </div>
 
           <div className="fc-card p-4">
-            <h4 className="fc-text-dim text-xs uppercase tracking-wide font-semibold mb-3">Your groups</h4>
+            <h4 className="fc-text-dim text-xs uppercase tracking-wide font-semibold mb-3">Your communities</h4>
             <div className="flex flex-col gap-1 mb-3 max-h-64 overflow-y-auto fc-scroll">
               {loadingGroups && <div className="text-sm fc-text-dim py-2">Loading…</div>}
               {!loadingGroups && groups.length === 0 && (
-                <div className="text-sm fc-text-dim py-2">No groups yet. Create or join one below.</div>
+                <div className="text-sm fc-text-dim py-2">No communities yet. Create or join one below.</div>
               )}
               {groups.map((g) => (
                 <button

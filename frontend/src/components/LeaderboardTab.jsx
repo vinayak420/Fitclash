@@ -3,9 +3,9 @@ import { api } from '../api';
 import Avatar from './Avatar';
 
 const MODES = [
-  { id: 'group', label: 'Group total' },
+  { id: 'group', label: 'Community total' },
   { id: 'weekly', label: 'This week' },
-  { id: 'overall', label: 'Overall (all groups)' },
+  { id: 'overall', label: 'Overall (all communities)' },
 ];
 
 export default function LeaderboardTab({ group, currentUserId }) {

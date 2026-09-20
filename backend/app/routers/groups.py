@@ -113,7 +113,7 @@ def join_group(
         .first()
     )
     if not group:
-        raise HTTPException(status_code=404, detail="No group found with that invite code")
+        raise HTTPException(status_code=404, detail="No community found with that invite code")
 
     existing = (
         db.query(models.GroupMember)
@@ -164,7 +164,7 @@ def get_group(
     get_membership_or_404(db, group_id, current_user.id)
     group = db.query(models.Group).filter(models.Group.id == group_id).first()
     if not group:
-        raise HTTPException(status_code=404, detail="Group not found")
+        raise HTTPException(status_code=404, detail="Community not found")
     return _group_detail(db, group)
 
 
@@ -178,7 +178,7 @@ def rename_group(
     require_admin(db, group_id, current_user.id)
     group = db.query(models.Group).filter(models.Group.id == group_id).first()
     if not group:
-        raise HTTPException(status_code=404, detail="Group not found")
+        raise HTTPException(status_code=404, detail="Community not found")
     group.name = payload.name.strip()
     db.commit()
     db.refresh(group)
@@ -194,7 +194,7 @@ def delete_group(
     require_admin(db, group_id, current_user.id)
     group = db.query(models.Group).filter(models.Group.id == group_id).first()
     if not group:
-        raise HTTPException(status_code=404, detail="Group not found")
+        raise HTTPException(status_code=404, detail="Community not found")
     db.delete(group)
     db.commit()
     return None
@@ -210,7 +210,7 @@ def remove_member(
     require_admin(db, group_id, current_user.id)
     group = db.query(models.Group).filter(models.Group.id == group_id).first()
     if user_id == group.admin_id:
-        raise HTTPException(status_code=400, detail="The admin cannot be removed from the group")
+        raise HTTPException(status_code=400, detail="The admin cannot be removed from the community")
     membership = (
         db.query(models.GroupMember)
         .filter(models.GroupMember.group_id == group_id, models.GroupMember.user_id == user_id)
@@ -234,7 +234,7 @@ def rename_challenge(
     require_admin(db, group_id, current_user.id)
     challenge = _get_active_challenge(db, group_id)
     if not challenge:
-        raise HTTPException(status_code=404, detail="No active challenge for this group")
+        raise HTTPException(status_code=404, detail="No active challenge for this community")
     challenge.name = payload.name.strip()
     db.commit()
     db.refresh(challenge)
@@ -251,7 +251,7 @@ def add_item(
     require_admin(db, group_id, current_user.id)
     challenge = _get_active_challenge(db, group_id)
     if not challenge:
-        raise HTTPException(status_code=404, detail="No active challenge for this group")
+        raise HTTPException(status_code=404, detail="No active challenge for this community")
     item = models.ChallengeItem(challenge_id=challenge.id, name=payload.name.strip(), points=payload.points)
     db.add(item)
     db.commit()
@@ -269,7 +269,7 @@ def remove_item(
     require_admin(db, group_id, current_user.id)
     challenge = _get_active_challenge(db, group_id)
     if not challenge:
-        raise HTTPException(status_code=404, detail="No active challenge for this group")
+        raise HTTPException(status_code=404, detail="No active challenge for this community")
     item = (
         db.query(models.ChallengeItem)
         .filter(models.ChallengeItem.id == item_id, models.ChallengeItem.challenge_id == challenge.id)

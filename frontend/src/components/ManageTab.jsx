@@ -113,7 +113,7 @@ function DeleteGroupSection({ group, onDeleted }) {
 
   return (
     <div className="pt-4" style={{ borderTop: '1px solid var(--steel)' }}>
-      <h4 className="text-xs fc-ember uppercase tracking-wide mb-2 font-semibold">Delete group</h4>
+      <h4 className="text-xs fc-ember uppercase tracking-wide mb-2 font-semibold">Delete community</h4>
       {error && <p className="text-sm fc-ember mb-2">{error}</p>}
       {!confirming ? (
         <button
@@ -121,13 +121,13 @@ function DeleteGroupSection({ group, onDeleted }) {
           className="fc-btn-ghost fc-focus rounded-lg px-4 py-2 text-sm"
           style={{ borderColor: 'var(--ember)', color: 'var(--ember)' }}
         >
-          Delete this group
+          Delete this community
         </button>
       ) : (
         <div className="fc-bg-ink3 rounded-lg p-4">
           <p className="text-sm mb-3">
             This permanently deletes <span className="font-semibold">{group.name}</span> — all members,
-            challenge history, check-ins, and points. This cannot be undone. Type the group name to confirm.
+            challenge history, check-ins, and points. This cannot be undone. Type the community name to confirm.
           </p>
           <input
             value={confirmText}

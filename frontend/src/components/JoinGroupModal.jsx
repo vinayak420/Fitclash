@@ -20,7 +20,7 @@ export default function JoinGroupModal({ onClose, onJoin }) {
   }
 
   return (
-    <Modal title="Join a group" onClose={onClose}>
+    <Modal title="Join a community" onClose={onClose}>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div>
           <label className="text-xs fc-text-dim uppercase tracking-wide">Invite code</label>
@@ -34,7 +34,7 @@ export default function JoinGroupModal({ onClose, onJoin }) {
           {error && <p className="text-xs fc-ember mt-1">{error}</p>}
         </div>
         <button type="submit" disabled={!code.trim() || busy} className="fc-btn-primary fc-focus rounded-lg py-2.5 font-display">
-          {busy ? 'JOINING…' : 'JOIN GROUP'}
+          {busy ? 'JOINING…' : 'JOIN COMMUNITY'}
         </button>
       </form>
     </Modal>

@@ -31,12 +31,12 @@ def get_membership_or_404(db: Session, group_id: int, user_id: int) -> models.Gr
         .first()
     )
     if membership is None:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You are not a member of this group")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="You are not a member of this community")
     return membership
 
 
 def require_admin(db: Session, group_id: int, user_id: int) -> models.GroupMember:
     membership = get_membership_or_404(db, group_id, user_id)
     if membership.role != models.RoleEnum.ADMIN:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only the group admin can do this")
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Only the community admin can do this")
     return membership

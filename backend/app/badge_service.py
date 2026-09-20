@@ -13,8 +13,8 @@ BADGE_DEFS = [
     {"code": "streak_5", "name": "5-Day Streak", "description": "Complete every item, 5 days in a row"},
     {"code": "streak_10", "name": "10-Day Streak", "description": "Complete every item, 10 days in a row"},
     {"code": "streak_30", "name": "30-Day Streak", "description": "Complete every item, 30 days in a row"},
-    {"code": "weekly_winner", "name": "Winner of the Week", "description": "Top the leaderboard for a completed week in one of your groups"},
-    {"code": "monthly_winner", "name": "Winner of the Month", "description": "Top the leaderboard for a completed month in one of your groups"},
+    {"code": "weekly_winner", "name": "Winner of the Week", "description": "Top the leaderboard for a completed week in one of your communities"},
+    {"code": "monthly_winner", "name": "Winner of the Month", "description": "Top the leaderboard for a completed month in one of your communities"},
 ]
 
 STREAK_THRESHOLDS = {"streak_3": 3, "streak_5": 5, "streak_10": 10, "streak_30": 30}
@@ -25,6 +25,9 @@ def seed_badges(db: Session) -> None:
         existing = db.query(models.Badge).filter(models.Badge.code == b["code"]).first()
         if not existing:
             db.add(models.Badge(**b))
+        else:
+            existing.name = b["name"]
+            existing.description = b["description"]
     db.commit()
 
 

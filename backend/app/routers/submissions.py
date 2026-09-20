@@ -71,7 +71,7 @@ def submit_checklist(
 
     challenge = _get_active_challenge(db, group_id)
     if not challenge:
-        raise HTTPException(status_code=400, detail="This group has no active challenge right now")
+        raise HTTPException(status_code=400, detail="This community has no active challenge right now")
 
     all_item_ids = {i.id for i in challenge.items}
     valid_points = {i.id: i.points for i in challenge.items}

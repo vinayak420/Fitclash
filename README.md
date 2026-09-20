@@ -1,7 +1,7 @@
 # FitClash — Fitness Challenge Platform
 
 A full-stack implementation of the Fitness Challenge Platform BRD: users sign up, create or join
-groups with friends via invite codes, complete a daily checklist, earn points, unlock badges, and
+communities with friends via invite codes, complete a daily checklist, earn points, unlock badges, and
 compete on leaderboards.
 
 ## Architecture
@@ -29,28 +29,28 @@ React Frontend  →  REST API  →  FastAPI Backend
 ## Features implemented
 
 - Email/password signup and login (JWT-based sessions)
-- Create a group → you become Admin, get a 6-character invite code, and a starter checklist
-- Join a group with an invite code
+- Create a community → you become Admin, get a 6-character invite code (no challenge is created yet)
+- Join a community with an invite code
 - **Challenges have a start date (auto-filled to today) and an optional end date** — leave it
   blank to run indefinitely
 - Admin can rename the active challenge, add/remove checklist items (with point values), and
   remove members
 - **Admin can end the active challenge at any time** from Manage → this finalizes it, crowns
-  whoever scored the most points during that challenge as the winner, and the group needs a new
+  whoever scored the most points during that challenge as the winner, and the community needs a new
   challenge started before members can check in again
 - One checklist submission per user per day; locks after submitting
-- Points roll up to both the group total and the user's overall total across all their groups
-- Leaderboards: group total, this week, and overall (across all groups)
+- Points roll up to both the community total and the user's overall total across all their communities
+- Leaderboards: community total, this week, and overall (across all communities)
 - **Badges** (7 total, evaluated automatically after each check-in):
   - **All-Rounder** — complete every checklist item in a single day
   - **3 / 5 / 10 / 30-Day Streak** — complete every item for that many consecutive days (four
     separate badges)
-  - **Winner of the Week** — finish a completed calendar week on top of a group's leaderboard
-  - **Winner of the Month** — finish a completed calendar month on top of a group's leaderboard
+  - **Winner of the Week** — finish a completed calendar week on top of a community's leaderboard
+  - **Winner of the Month** — finish a completed calendar month on top of a community's leaderboard
 - **Profile stats** (shown in the sidebar): total points, current full-completion streak, badges
-  earned, and **challenges won** (how many group challenges you've been crowned the winner of)
-- **Delete a group** — the admin can permanently delete a group (and all its history) from Manage,
-  with a type-the-group-name confirmation step
+  earned, and **challenges won** (how many community challenges you've been crowned the winner of)
+- **Delete a community** — the admin can permanently delete a community (and all its history) from Manage,
+  with a type-the-community-name confirmation step
 - **Email verification** — new accounts get a verification link; a banner prompts unverified
   users to verify, with a resend option. Login isn't blocked on this — it's just a nudge.
 - **Forgot / reset password** — a standard "forgot password" flow with time-limited, single-use
@@ -121,10 +121,10 @@ your backend runs elsewhere.
 ### 3. Try it out
 
 1. Sign up with a name, email, and password.
-2. Create a group — you'll get an invite code.
+2. Create a community — you'll get an invite code.
 3. Open an incognito window (or have a friend) sign up and join using that code.
 4. Check off today's items and submit — watch points, streaks, and the leaderboard update.
-5. As the group admin, visit the **Manage** tab to edit the checklist.
+5. As the community admin, visit the **Manage** tab to edit the checklist.
 
 ## Configuration
 

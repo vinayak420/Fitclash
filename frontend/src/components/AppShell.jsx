@@ -13,9 +13,9 @@ export default function AppShell() {
   const showTabs = TABS.some((t) => t.to === pathname);
 
   return (
-    <div className="min-h-full" style={{ background: 'var(--ink)' }}>
-      <div className="relative mx-auto flex min-h-full max-w-lg flex-col">
-        <main className={`flex-1 px-4 pt-5 ${showTabs ? 'pb-24' : 'pb-8'}`}>
+    <div className="fc-app-shell">
+      <div className={`fc-app-frame ${showTabs ? 'has-tabs' : ''}`}>
+        <main className="fc-app-main">
           <Outlet />
         </main>
         {showTabs && (

@@ -8,6 +8,7 @@ from sqlalchemy import func
 from .. import models, schemas
 from ..database import get_db
 from ..deps import get_current_user, get_membership_or_404
+from ..storage import public_avatar_url
 
 router = APIRouter(prefix="/groups/{group_id}/leaderboard", tags=["leaderboard"])
 
@@ -29,6 +30,7 @@ def leaderboard(
     )
     member_ids = [u.id for _, u in member_rows]
     names = {u.id: u.name for _, u in member_rows}
+    avatars = {u.id: public_avatar_url(u) for _, u in member_rows}
 
     points_by_user = {uid: 0 for uid in member_ids}
 
@@ -56,6 +58,12 @@ def leaderboard(
 
     ranked = sorted(points_by_user.items(), key=lambda kv: kv[1], reverse=True)
     return [
-        schemas.LeaderboardRow(user_id=uid, name=names.get(uid, "Unknown"), points=pts, rank=idx + 1)
+        schemas.LeaderboardRow(
+            user_id=uid,
+            name=names.get(uid, "Unknown"),
+            points=pts,
+            rank=idx + 1,
+            avatar_url=avatars.get(uid),
+        )
         for idx, (uid, pts) in enumerate(ranked)
     ]

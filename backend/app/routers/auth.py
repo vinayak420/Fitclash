@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from sqlalchemy.orm import Session
 
 from .. import models, schemas
@@ -12,6 +12,9 @@ from ..security import (
 from ..deps import get_current_user
 from ..email_utils import (
     send_verification_email, send_password_reset_email, is_console_backend,
+)
+from ..storage import (
+    ALLOWED_CONTENT_TYPES, MAX_UPLOAD_BYTES, delete_avatar, process_avatar, upload_avatar,
 )
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -80,6 +83,47 @@ def login(payload: schemas.LoginRequest, db: Session = Depends(get_db)):
 
 @router.get("/me", response_model=schemas.UserOut)
 def me(current_user: models.User = Depends(get_current_user)):
+    return current_user
+
+
+@router.post("/me/avatar", response_model=schemas.UserOut)
+async def upload_my_avatar(
+    file: UploadFile = File(...),
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    content_type = (file.content_type or "").lower()
+    if content_type not in ALLOWED_CONTENT_TYPES:
+        raise HTTPException(status_code=400, detail="Use a JPG, PNG, or WebP image.")
+
+    data = await file.read()
+    if not data:
+        raise HTTPException(status_code=400, detail="The selected file is empty.")
+    if len(data) > MAX_UPLOAD_BYTES:
+        raise HTTPException(status_code=400, detail="Keep the photo under 5 MB.")
+
+    processed = process_avatar(data)
+    new_key = upload_avatar(current_user.id, processed)
+    old_key = current_user.avatar_key
+    current_user.avatar_key = new_key
+    db.commit()
+    db.refresh(current_user)
+    if old_key and old_key != new_key:
+        delete_avatar(old_key)
+    return current_user
+
+
+@router.delete("/me/avatar", response_model=schemas.UserOut)
+def delete_my_avatar(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    old_key = current_user.avatar_key
+    current_user.avatar_key = None
+    db.commit()
+    db.refresh(current_user)
+    if old_key:
+        delete_avatar(old_key)
     return current_user
 
 

@@ -27,7 +27,7 @@ export default function MembersTab({ group, currentUserId, isAdmin, onChanged })
         const isGroupAdmin = m.user_id === group.admin_id;
         return (
           <div key={m.user_id} className="flex items-center gap-3 px-4 py-3 fc-bg-ink3 rounded-lg">
-            <Avatar name={m.name} size={34} />
+            <Avatar name={m.name} size={34} src={m.avatar_url} />
             <div className="flex-1 text-sm">
               {m.name}{m.user_id === currentUserId ? ' (you)' : ''}
             </div>

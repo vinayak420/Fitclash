@@ -1,11 +1,11 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from .database import Base, engine, SessionLocal
+from .database import SessionLocal, ensure_schema
 from .routers import auth, groups, submissions, leaderboard, users
 from .badge_service import seed_badges
 
-Base.metadata.create_all(bind=engine)
+ensure_schema()
 
 with SessionLocal() as db:
     seed_badges(db)
@@ -13,7 +13,9 @@ with SessionLocal() as db:
 app = FastAPI(title="FitClash API", version="1.0.0")
 
 origins = [
-    "https://fitclash-two.vercel.app"
+    "https://fitclash-two.vercel.app",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
 ]
 
 app.add_middleware(
@@ -28,6 +30,7 @@ app.include_router(groups.router)
 app.include_router(submissions.router)
 app.include_router(leaderboard.router)
 app.include_router(users.router)
+app.include_router(users.avatar_router)
 
 
 @app.get("/health")

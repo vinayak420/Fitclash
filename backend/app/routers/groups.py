@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session, joinedload
 from .. import models, schemas
 from ..database import get_db
 from ..deps import get_current_user, get_membership_or_404, require_admin
+from ..storage import public_avatar_url
 
 router = APIRouter(prefix="/groups", tags=["groups"])
 
@@ -46,7 +47,9 @@ def _challenge_summary(db: Session, challenge: models.Challenge) -> schemas.Chal
         .all()
     )
     winners = [
-        schemas.ChallengeWinnerOut(user_id=u.id, name=u.name, points=cw.points) for cw, u in winner_rows
+        schemas.ChallengeWinnerOut(
+            user_id=u.id, name=u.name, points=cw.points, avatar_url=public_avatar_url(u),
+        ) for cw, u in winner_rows
     ]
     return schemas.ChallengeSummary(
         id=challenge.id, name=challenge.name, start_date=challenge.start_date,
@@ -62,7 +65,9 @@ def _group_detail(db: Session, group: models.Group) -> schemas.GroupDetail:
         .all()
     )
     member_out = [
-        schemas.MemberOut(user_id=u.id, name=u.name, role=gm.role.value) for gm, u in members
+        schemas.MemberOut(
+            user_id=u.id, name=u.name, role=gm.role.value, avatar_url=public_avatar_url(u),
+        ) for gm, u in members
     ]
 
     active_challenge = _get_active_challenge(db, group.id)
@@ -352,9 +357,18 @@ def end_challenge(
     db.commit()
     db.refresh(challenge)
 
-    users_by_id = {u.id: u.name for u in db.query(models.User).filter(models.User.id.in_(member_ids)).all()}
+    users = db.query(models.User).filter(models.User.id.in_(member_ids)).all()
+    users_by_id = {u.id: u for u in users}
     final_standings = sorted(
-        [schemas.ChallengeWinnerOut(user_id=uid, name=users_by_id.get(uid, "Unknown"), points=pts) for uid, pts in totals.items()],
+        [
+            schemas.ChallengeWinnerOut(
+                user_id=uid,
+                name=users_by_id[uid].name if uid in users_by_id else "Unknown",
+                points=pts,
+                avatar_url=public_avatar_url(users_by_id[uid]) if uid in users_by_id else None,
+            )
+            for uid, pts in totals.items()
+        ],
         key=lambda r: r.points, reverse=True,
     )
 

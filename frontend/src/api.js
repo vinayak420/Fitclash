@@ -74,4 +74,21 @@ export const api = {
 
   myStats: () => request('GET', '/users/me/stats'),
   myBadges: () => request('GET', '/users/me/badges'),
+
+  uploadAvatar: async (file) => {
+    const form = new FormData();
+    form.append('file', file);
+    const headers = {};
+    if (authToken) headers.Authorization = `Bearer ${authToken}`;
+    let res;
+    try {
+      res = await fetch(`${API_BASE}/auth/me/avatar`, { method: 'POST', headers, body: form });
+    } catch (e) {
+      throw new Error('Could not reach the server. Is the backend running?');
+    }
+    const data = await res.json().catch(() => null);
+    if (!res.ok) throw new Error((data && data.detail) || `Request failed (${res.status})`);
+    return data;
+  },
+  deleteAvatar: () => request('DELETE', '/auth/me/avatar'),
 };

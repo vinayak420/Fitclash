@@ -49,7 +49,7 @@ export default function LeaderboardTab({ group, currentUserId }) {
                 style={{ border: row.user_id === currentUserId ? '1px solid var(--signal)' : '1px solid transparent' }}
               >
                 <div className={`fc-display text-xl w-7 text-center ${rankClass}`}>{row.rank}</div>
-                <Avatar name={row.name} size={32} />
+                <Avatar name={row.name} size={32} src={row.avatar_url} />
                 <div className="flex-1 text-sm truncate">
                   {row.name}{row.user_id === currentUserId ? ' (you)' : ''}
                 </div>

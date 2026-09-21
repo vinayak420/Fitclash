@@ -1,6 +1,6 @@
 from datetime import date, datetime
 from typing import List, Optional
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, computed_field
 
 
 # ---------- Auth ----------
@@ -26,13 +26,21 @@ class SignupResponse(TokenResponse):
 
 
 class UserOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
     id: int
     name: str
     email: EmailStr
     is_email_verified: bool
+    avatar_key: Optional[str] = Field(default=None, exclude=True)
 
-    class Config:
-        from_attributes = True
+    @computed_field
+    @property
+    def avatar_url(self) -> Optional[str]:
+        if not self.avatar_key:
+            return None
+        version = self.avatar_key.rsplit("/", 1)[-1].split(".")[0]
+        return f"/users/{self.id}/avatar?v={version}"
 
 
 class MessageResponse(BaseModel):
@@ -94,6 +102,7 @@ class ChallengeWinnerOut(BaseModel):
     user_id: int
     name: str
     points: int
+    avatar_url: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -134,6 +143,7 @@ class MemberOut(BaseModel):
     user_id: int
     name: str
     role: str
+    avatar_url: Optional[str] = None
 
     class Config:
         from_attributes = True
@@ -187,6 +197,7 @@ class LeaderboardRow(BaseModel):
     name: str
     points: int
     rank: int
+    avatar_url: Optional[str] = None
 
 
 # ---------- Badges ----------

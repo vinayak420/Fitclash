@@ -9,6 +9,9 @@ import { api } from '../api';
 import Avatar from '../components/Avatar';
 import EmailVerificationBanner from '../components/EmailVerificationBanner';
 
+const MAX_BYTES = 5 * 1024 * 1024;
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+
 export default function ProfilePage() {
   const { user, logout, refreshUser } = useAuth();
   const { notify } = useToast();
@@ -71,7 +74,7 @@ export default function ProfilePage() {
 
       <div className="fc-card p-4">
         <div className="flex items-center gap-4">
-          <Avatar name={user.name} size={72} />
+          <Avatar name={user.name} size={72} src={user.avatar_url} />
           <div className="min-w-0">
             <div className="font-bold text-xl truncate">{user.name}</div>
             <div className="fc-text-dim text-sm truncate">{user.email}</div>
@@ -135,9 +138,18 @@ export default function ProfilePage() {
           onClick={() => setPanel(panel === 'photo' ? 'none' : 'photo')}
         />
         {panel === 'photo' && (
-          <p className="fc-text-dim text-xs leading-5 mb-2">
-            Photos are not stored yet. Your avatar uses the first letter of your name.
-          </p>
+          <PhotoEditor
+            user={user}
+            onSaved={async () => {
+              await refreshUser();
+              notify('Profile photo updated');
+            }}
+            onRemoved={async () => {
+              await refreshUser();
+              notify('Profile photo removed');
+            }}
+            onError={(msg) => notify(msg)}
+          />
         )}
         <ActionRow
           icon={<KeyRound size={18} className="fc-signal" />}
@@ -164,6 +176,115 @@ export default function ProfilePage() {
       >
         <LogOut size={16} /> Sign out
       </button>
+    </div>
+  );
+}
+
+function PhotoEditor({ user, onSaved, onRemoved, onError }) {
+  const [preview, setPreview] = useState(null);
+  const [file, setFile] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+
+  useEffect(() => () => {
+    if (preview) URL.revokeObjectURL(preview);
+  }, [preview]);
+
+  function onPick(e) {
+    const next = e.target.files && e.target.files[0];
+    e.target.value = '';
+    if (!next) return;
+    if (!ALLOWED_TYPES.includes(next.type)) {
+      setError('Use a JPG, PNG, or WebP image.');
+      return;
+    }
+    if (next.size > MAX_BYTES) {
+      setError('Keep the photo under 5 MB.');
+      return;
+    }
+    setError('');
+    setFile(next);
+    setPreview((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return URL.createObjectURL(next);
+    });
+  }
+
+  async function handleSave() {
+    if (!file) return;
+    setBusy(true);
+    setError('');
+    try {
+      await api.uploadAvatar(file);
+      setFile(null);
+      setPreview((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return null;
+      });
+      await onSaved();
+    } catch (err) {
+      setError(err.message);
+      onError(err.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleRemove() {
+    setBusy(true);
+    setError('');
+    try {
+      await api.deleteAvatar();
+      setFile(null);
+      setPreview((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return null;
+      });
+      await onRemoved();
+    } catch (err) {
+      setError(err.message);
+      onError(err.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  return (
+    <div className="fc-bg-ink3 rounded-[20px] p-4 mb-2 flex flex-col gap-3">
+      <div className="flex items-center gap-3">
+        <Avatar name={user.name} size={88} src={preview || user.avatar_url} />
+        <div className="text-xs fc-text-dim leading-5">
+          JPG, PNG, or WebP. Max 5 MB. We’ll crop it to a round avatar.
+        </div>
+      </div>
+      <input
+        type="file"
+        accept="image/jpeg,image/png,image/webp"
+        onChange={onPick}
+        className="text-xs"
+      />
+      {error && <p className="text-sm fc-ember">{error}</p>}
+      <div className="flex gap-2 flex-wrap">
+        <button
+          type="button"
+          disabled={!file || busy}
+          onClick={handleSave}
+          className="fc-btn-primary fc-focus px-4 py-2 text-sm"
+        >
+          {busy ? 'Saving…' : 'Save photo'}
+        </button>
+        {user.avatar_url && (
+          <button
+            type="button"
+            disabled={busy}
+            onClick={handleRemove}
+            className="fc-btn-ghost fc-focus px-4 py-2 text-sm"
+            style={{ borderColor: 'var(--ember)', color: 'var(--ember)' }}
+          >
+            Remove photo
+          </button>
+        )}
+      </div>
     </div>
   );
 }

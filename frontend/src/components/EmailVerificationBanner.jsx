@@ -21,7 +21,7 @@ export default function EmailVerificationBanner() {
   }
 
   return (
-    <div className="fc-card p-4 mb-4 flex flex-col sm:flex-row sm:items-center gap-3">
+    <div className="fc-card p-4 flex flex-col sm:flex-row sm:items-center gap-3">
       <MailWarning size={20} className="fc-signal shrink-0" />
       <div className="flex-1 text-sm">
         <span className="font-semibold">Verify your email</span>{' '}

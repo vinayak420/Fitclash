@@ -17,7 +17,7 @@ export default function LoginPage() {
     setBusy(true);
     try {
       await login(email, password);
-      navigate('/');
+      navigate('/profile');
     } catch (err) {
       setError(err.message);
     } finally {

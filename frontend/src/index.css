@@ -161,3 +161,32 @@ body {
   outline: 2px solid var(--signal);
   outline-offset: 2px;
 }
+
+.fc-tab-bar {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  background: var(--ink-2);
+  border-top: 1px solid var(--steel);
+  padding: 8px 4px calc(8px + env(safe-area-inset-bottom));
+  z-index: 40;
+}
+
+.fc-bottom-tab {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  color: var(--chalk-dim);
+  font-size: 10px;
+  font-weight: 600;
+  text-align: center;
+  line-height: 1.2;
+  padding: 6px 4px;
+  text-decoration: none;
+}
+.fc-bottom-tab.active {
+  color: var(--signal);
+}

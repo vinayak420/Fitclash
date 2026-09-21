@@ -18,7 +18,7 @@ export default function SignupPage() {
     setBusy(true);
     try {
       await signup(name, email, password);
-      navigate('/');
+      navigate('/profile');
     } catch (err) {
       setError(err.message);
     } finally {

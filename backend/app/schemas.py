@@ -1,6 +1,6 @@
 from datetime import date, datetime
 from typing import List, Optional
-from pydantic import BaseModel, ConfigDict, EmailStr, Field, computed_field
+from pydantic import BaseModel, EmailStr, Field
 
 
 # ---------- Auth ----------
@@ -26,21 +26,25 @@ class SignupResponse(TokenResponse):
 
 
 class UserOut(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
     id: int
     name: str
-    email: EmailStr
+    email: str
     is_email_verified: bool
-    avatar_key: Optional[str] = Field(default=None, exclude=True)
+    avatar_url: Optional[str] = None
 
-    @computed_field
-    @property
-    def avatar_url(self) -> Optional[str]:
-        if not self.avatar_key:
-            return None
-        version = self.avatar_key.rsplit("/", 1)[-1].split(".")[0]
-        return f"/users/{self.id}/avatar?v={version}"
+    class Config:
+        from_attributes = True
+
+
+def user_out_from_orm(user) -> UserOut:
+    from .storage import public_avatar_url
+    return UserOut(
+        id=user.id,
+        name=user.name,
+        email=user.email,
+        is_email_verified=bool(user.is_email_verified),
+        avatar_url=public_avatar_url(user),
+    )
 
 
 class MessageResponse(BaseModel):

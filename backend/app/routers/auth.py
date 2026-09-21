@@ -83,7 +83,7 @@ def login(payload: schemas.LoginRequest, db: Session = Depends(get_db)):
 
 @router.get("/me", response_model=schemas.UserOut)
 def me(current_user: models.User = Depends(get_current_user)):
-    return current_user
+    return schemas.user_out_from_orm(current_user)
 
 
 @router.post("/me/avatar", response_model=schemas.UserOut)
@@ -110,7 +110,7 @@ async def upload_my_avatar(
     db.refresh(current_user)
     if old_key and old_key != new_key:
         delete_avatar(old_key)
-    return current_user
+    return schemas.user_out_from_orm(current_user)
 
 
 @router.delete("/me/avatar", response_model=schemas.UserOut)
@@ -124,7 +124,7 @@ def delete_my_avatar(
     db.refresh(current_user)
     if old_key:
         delete_avatar(old_key)
-    return current_user
+    return schemas.user_out_from_orm(current_user)
 
 
 @router.post("/verify-email", response_model=schemas.MessageResponse)

@@ -10,7 +10,13 @@ from fastapi import HTTPException, status
 from PIL import Image, ImageDraw, ImageOps
 
 MAX_UPLOAD_BYTES = 5 * 1024 * 1024
-ALLOWED_CONTENT_TYPES = {"image/jpeg", "image/png", "image/webp"}
+ALLOWED_CONTENT_TYPES = {
+    "image/jpeg",
+    "image/jpg",
+    "image/pjpeg",
+    "image/png",
+    "image/webp",
+}
 ALLOWED_FORMATS = {"JPEG", "PNG", "WEBP"}
 AVATAR_SIZE = 512
 
@@ -70,29 +76,20 @@ def _client_and_bucket():
         aws_access_key_id=access_key,
         aws_secret_access_key=secret_key,
         region_name=region,
-        config=Config(s3={"addressing_style": "path"}),
+        config=Config(
+            s3={"addressing_style": "path"},
+            connect_timeout=8,
+            read_timeout=20,
+            retries={"max_attempts": 2},
+            request_checksum_calculation="when_required",
+            response_checksum_validation="when_required",
+        ),
     )
     return client, bucket
 
 
-def _ensure_bucket(client, bucket: str):
-    try:
-        client.head_bucket(Bucket=bucket)
-        return
-    except ClientError:
-        pass
-    try:
-        client.create_bucket(Bucket=bucket)
-    except ClientError as err:
-        raise HTTPException(
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-            detail="Could not access the profile photo bucket.",
-        ) from err
-
-
 def upload_avatar(user_id: int, image_bytes: bytes) -> str:
     client, bucket = _client_and_bucket()
-    _ensure_bucket(client, bucket)
     key = f"avatars/{user_id}/{uuid.uuid4().hex}.webp"
     try:
         client.put_object(
@@ -103,6 +100,12 @@ def upload_avatar(user_id: int, image_bytes: bytes) -> str:
             CacheControl="public, max-age=31536000",
         )
     except ClientError as err:
+        code = (err.response.get("Error") or {}).get("Code", "")
+        raise HTTPException(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            detail=f"Could not save the profile photo ({code or 'storage error'}).",
+        ) from err
+    except Exception as err:
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Could not save the profile photo.",

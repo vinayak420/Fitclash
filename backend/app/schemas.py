@@ -78,7 +78,7 @@ class ChallengeItemOut(BaseModel):
 
 class ChallengeItemCreate(BaseModel):
     name: str = Field(min_length=1, max_length=200)
-    points: int = Field(ge=1, le=1000)
+    points: int = Field(ge=-1000, le=1000)
 
 
 class ChallengeOut(BaseModel):

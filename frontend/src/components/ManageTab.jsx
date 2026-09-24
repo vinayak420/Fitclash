@@ -11,6 +11,18 @@ function formatDate(d) {
   return new Date(d + 'T00:00:00').toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
 }
 
+function parseTaskPoints(value) {
+  const n = Number(value);
+  if (!Number.isInteger(n) || n < -1000 || n > 1000) return null;
+  return n;
+}
+
+function parseTaskPoints(value) {
+  const n = Number(value);
+  if (!Number.isInteger(n) || n < -1000 || n > 1000) return null;
+  return n;
+}
+
 function StartChallengeForm({ group, onChanged }) {
   const [name, setName] = useState('');
   const [endDate, setEndDate] = useState('');
@@ -163,12 +175,36 @@ export default function ManageTab({ group, onChanged }) {
   async function handleAddItem(e) {
     e.preventDefault();
     if (!newItemName.trim()) return;
+    const points = parseTaskPoints(newItemPoints);
+    if (points === null) {
+      setError('Points must be a whole number from -1000 to 1000.');
+      return;
+    }
     setBusy(true);
     setError('');
     try {
-      await api.addItem(group.id, newItemName.trim(), Math.max(1, Number(newItemPoints) || 1));
+      await api.addItem(group.id, newItemName.trim(), points);
       setNewItemName('');
       setNewItemPoints(5);
+      onChanged();
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setBusy(false);
+    }
+  }
+
+  async function handleUpdateItemPoints(item, raw) {
+    const points = parseTaskPoints(raw);
+    if (points === null) {
+      setError('Points must be a whole number from -1000 to 1000.');
+      return;
+    }
+    if (points === item.points) return;
+    setBusy(true);
+    setError('');
+    try {
+      await api.updateItem(group.id, item.id, item.name, points);
       onChanged();
     } catch (err) {
       setError(err.message);
@@ -250,7 +286,15 @@ export default function ManageTab({ group, onChanged }) {
           {challenge.items.map((item) => (
             <div key={item.id} className="flex items-center gap-3 px-3 py-2 fc-bg-ink3 rounded-lg">
               <span className="flex-1 text-sm">{item.name}</span>
-              <span className="fc-mono text-xs fc-text-dim">{item.points} pts</span>
+              <input
+                key={`${item.id}-${item.points}`}
+                type="number"
+                defaultValue={item.points}
+                disabled={busy}
+                aria-label={`Points for ${item.name} (-1000 to +1000)`}
+                className="fc-input fc-focus w-20 px-2 py-1 text-sm fc-mono"
+                onBlur={(e) => handleUpdateItemPoints(item, e.target.value)}
+              />
               <button
                 onClick={() => handleRemoveItem(item.id)}
                 disabled={busy}
@@ -275,10 +319,12 @@ export default function ManageTab({ group, onChanged }) {
           />
           <input
             type="number"
-            min={1}
             value={newItemPoints}
             onChange={(e) => setNewItemPoints(e.target.value)}
-            className="fc-input fc-focus w-20 px-3 py-2 text-sm"
+            placeholder="Pts"
+            aria-label="Points (-1000 to +1000)"
+            title="Points (-1000 to +1000)"
+            className="fc-input fc-focus w-24 px-3 py-2 text-sm"
           />
           <button type="submit" disabled={busy} className="fc-btn-primary fc-focus rounded-lg px-4 py-2 text-sm flex items-center gap-1">
             <Plus size={14} /> Add

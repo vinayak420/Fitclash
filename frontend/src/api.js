@@ -61,6 +61,8 @@ export const api = {
 
   renameChallenge: (groupId, name) => request('PUT', `/groups/${groupId}/challenge`, { name }),
   addItem: (groupId, name, points) => request('POST', `/groups/${groupId}/challenge/items`, { name, points }),
+  updateItem: (groupId, itemId, name, points) =>
+    request('PUT', `/groups/${groupId}/challenge/items/${itemId}`, { name, points }),
   removeItem: (groupId, itemId) => request('DELETE', `/groups/${groupId}/challenge/items/${itemId}`),
   startChallenge: (groupId, name, endDate) =>
     request('POST', `/groups/${groupId}/challenge/start`, { name, end_date: endDate || null }),

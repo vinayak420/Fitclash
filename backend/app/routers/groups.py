@@ -19,6 +19,27 @@ def _get_active_challenge(db: Session, group_id: int):
     )
 
 
+def _recalc_challenge_submissions(db: Session, challenge: models.Challenge) -> None:
+    """Re-sum daily totals from current item point values (including negatives)."""
+    db.refresh(challenge)
+    valid_points = {i.id: i.points for i in challenge.items}
+    all_ids = set(valid_points)
+    subs = (
+        db.query(models.DailySubmission)
+        .filter(models.DailySubmission.challenge_id == challenge.id)
+        .all()
+    )
+    for sub in subs:
+        kept = []
+        for si in list(sub.items):
+            if si.challenge_item_id in valid_points:
+                kept.append(si.challenge_item_id)
+            else:
+                db.delete(si)
+        sub.points_earned = sum(valid_points[i] for i in kept)
+        sub.is_full_completion = bool(all_ids) and set(kept) == all_ids
+
+
 def _get_last_completed_challenge(db: Session, group_id: int):
     return (
         db.query(models.Challenge)
@@ -264,6 +285,34 @@ def add_item(
     return item
 
 
+@router.put("/{group_id}/challenge/items/{item_id}", response_model=schemas.ChallengeItemOut)
+def update_item(
+    group_id: int,
+    item_id: int,
+    payload: schemas.ChallengeItemCreate,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    require_admin(db, group_id, current_user.id)
+    challenge = _get_active_challenge(db, group_id)
+    if not challenge:
+        raise HTTPException(status_code=404, detail="No active challenge for this community")
+    item = (
+        db.query(models.ChallengeItem)
+        .filter(models.ChallengeItem.id == item_id, models.ChallengeItem.challenge_id == challenge.id)
+        .first()
+    )
+    if not item:
+        raise HTTPException(status_code=404, detail="Checklist item not found")
+    item.name = payload.name.strip()
+    item.points = payload.points
+    db.flush()
+    _recalc_challenge_submissions(db, challenge)
+    db.commit()
+    db.refresh(item)
+    return item
+
+
 @router.delete("/{group_id}/challenge/items/{item_id}", status_code=status.HTTP_204_NO_CONTENT)
 def remove_item(
     group_id: int,
@@ -281,7 +330,10 @@ def remove_item(
         .first()
     )
     if item:
+        db.query(models.SubmissionItem).filter(models.SubmissionItem.challenge_item_id == item.id).delete()
         db.delete(item)
+        db.flush()
+        _recalc_challenge_submissions(db, challenge)
         db.commit()
     return None
 

@@ -59,7 +59,7 @@ export default function TodayTab({ group, onChanged, notify }) {
     try {
       const sub = await api.submitChecklist(group.id, Array.from(checked));
       setTodaySub(sub);
-      notify(`Checked in — +${sub.points_earned} points`);
+      notify(`Checked in — ${sub.points_earned > 0 ? '+' : ''}${sub.points_earned} points`);
       onChanged();
     } catch (err) {
       setError(err.message);
@@ -101,7 +101,7 @@ export default function TodayTab({ group, onChanged, notify }) {
                 {isChecked ? <CheckCircle2 size={20} className="fc-turf" /> : <Circle size={20} className="fc-text-dim" />}
                 <span>{item.name}</span>
               </span>
-              <span className="fc-mono text-xs fc-text-dim">+{item.points}</span>
+              <span className="fc-mono text-xs fc-text-dim">{item.points > 0 ? `+${item.points}` : item.points}</span>
             </button>
           );
         })}

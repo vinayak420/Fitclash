@@ -288,10 +288,8 @@ export default function ManageTab({ group, onChanged }) {
               <span className="flex-1 text-sm">{item.name}</span>
               <input
                 key={`${item.id}-${item.points}`}
-                type="number"
-                min={-1000}
-                max={1000}
-                step={1}
+                type="text"
+                inputMode="numeric"
                 defaultValue={item.points}
                 disabled={busy}
                 aria-label={`Points for ${item.name} (-1000 to +1000)`}
@@ -321,13 +319,11 @@ export default function ManageTab({ group, onChanged }) {
             className="fc-input fc-focus flex-1 min-w-[160px] px-3 py-2 text-sm"
           />
           <input
-            type="number"
-            min={-1000}
-            max={1000}
-            step={1}
+            type="text"
+            inputMode="numeric"
             value={newItemPoints}
             onChange={(e) => setNewItemPoints(e.target.value)}
-            placeholder="Pts"
+            placeholder="Pts (+/-)"
             aria-label="Points (-1000 to +1000)"
             title="Points (-1000 to +1000)"
             className="fc-input fc-focus w-24 px-3 py-2 text-sm"

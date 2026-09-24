@@ -289,6 +289,9 @@ export default function ManageTab({ group, onChanged }) {
               <input
                 key={`${item.id}-${item.points}`}
                 type="number"
+                min={-1000}
+                max={1000}
+                step={1}
                 defaultValue={item.points}
                 disabled={busy}
                 aria-label={`Points for ${item.name} (-1000 to +1000)`}
@@ -310,7 +313,7 @@ export default function ManageTab({ group, onChanged }) {
           )}
         </div>
 
-        <form onSubmit={handleAddItem} className="flex gap-2 flex-wrap">
+        <form onSubmit={handleAddItem} className="flex gap-2 flex-wrap" noValidate>
           <input
             value={newItemName}
             onChange={(e) => setNewItemName(e.target.value)}
@@ -319,6 +322,9 @@ export default function ManageTab({ group, onChanged }) {
           />
           <input
             type="number"
+            min={-1000}
+            max={1000}
+            step={1}
             value={newItemPoints}
             onChange={(e) => setNewItemPoints(e.target.value)}
             placeholder="Pts"

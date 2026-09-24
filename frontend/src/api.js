@@ -76,6 +76,10 @@ export const api = {
 
   myStats: () => request('GET', '/users/me/stats'),
   myBadges: () => request('GET', '/users/me/badges'),
+  getUserProfile: (userId, groupId) => {
+    const q = groupId ? `?group_id=${groupId}` : '';
+    return request('GET', `/users/${userId}/profile${q}`);
+  },
 
   uploadAvatar: async (file) => {
     const form = new FormData();

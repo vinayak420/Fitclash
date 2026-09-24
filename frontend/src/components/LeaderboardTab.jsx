@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { api } from '../api';
 import Avatar from './Avatar';
+import { playerProfilePath } from '../playerProfile';
 
 const MODES = [
   { id: 'group', label: 'Community total' },
@@ -9,6 +11,7 @@ const MODES = [
 ];
 
 export default function LeaderboardTab({ group, currentUserId }) {
+  const navigate = useNavigate();
   const [mode, setMode] = useState('group');
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -43,10 +46,13 @@ export default function LeaderboardTab({ group, currentUserId }) {
             const rankClass =
               row.rank === 1 ? 'fc-rank-1' : row.rank === 2 ? 'fc-rank-2' : row.rank === 3 ? 'fc-rank-3' : 'fc-text-dim';
             return (
-              <div
+              <button
                 key={row.user_id}
-                className="flex items-center gap-4 px-4 py-3 fc-bg-ink3 rounded-lg"
+                type="button"
+                onClick={() => navigate(playerProfilePath(currentUserId, row.user_id, group.id))}
+                className="flex items-center gap-4 px-4 py-3 fc-bg-ink3 rounded-lg text-left w-full fc-focus"
                 style={{ border: row.user_id === currentUserId ? '1px solid var(--signal)' : '1px solid transparent' }}
+                aria-label={`View ${row.name}'s profile`}
               >
                 <div className={`fc-display text-xl w-7 text-center ${rankClass}`}>{row.rank}</div>
                 <Avatar name={row.name} size={32} src={row.avatar_url} />
@@ -54,7 +60,7 @@ export default function LeaderboardTab({ group, currentUserId }) {
                   {row.name}{row.user_id === currentUserId ? ' (you)' : ''}
                 </div>
                 <div className="fc-mono fc-signal">{row.points}</div>
-              </div>
+              </button>
             );
           })}
         </div>

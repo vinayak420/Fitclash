@@ -18,6 +18,22 @@ BADGE_DEFS = [
 ]
 
 STREAK_THRESHOLDS = {"streak_3": 3, "streak_5": 5, "streak_10": 10, "streak_30": 30}
+# Inclusive window used by leaderboard mode=weekly (today and the previous 6 days).
+WEEKLY_POINTS_LOOKBACK_DAYS = 6
+
+
+def weekly_points_cutoff() -> date:
+    return date.today() - timedelta(days=WEEKLY_POINTS_LOOKBACK_DAYS)
+
+
+def compute_weekly_points(db: Session, user_id: int, group_id: int | None = None) -> int:
+    q = db.query(func.coalesce(func.sum(models.DailySubmission.points_earned), 0)).filter(
+        models.DailySubmission.user_id == user_id,
+        models.DailySubmission.date >= weekly_points_cutoff(),
+    )
+    if group_id is not None:
+        q = q.filter(models.DailySubmission.group_id == group_id)
+    return int(q.scalar() or 0)
 
 
 def seed_badges(db: Session) -> None:

@@ -1,4 +1,3 @@
-from datetime import date, timedelta
 from typing import Literal
 
 from fastapi import APIRouter, Depends, Query
@@ -6,6 +5,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func
 
 from .. import models, schemas
+from ..badge_service import weekly_points_cutoff
 from ..database import get_db
 from ..deps import get_current_user, get_membership_or_404
 from ..storage import public_avatar_url
@@ -49,8 +49,7 @@ def leaderboard(
             models.DailySubmission.user_id.in_(member_ids),
         )
         if mode == "weekly":
-            cutoff = date.today() - timedelta(days=6)
-            q = q.filter(models.DailySubmission.date >= cutoff)
+            q = q.filter(models.DailySubmission.date >= weekly_points_cutoff())
         rows = q.group_by(models.DailySubmission.user_id).all()
 
     for uid, total in rows:

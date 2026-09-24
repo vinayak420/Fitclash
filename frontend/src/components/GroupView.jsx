@@ -1,10 +1,12 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { ClipboardList, Trophy, Award, Users, Settings, Copy, Flag, Share2 } from 'lucide-react';
 import TodayTab from './TodayTab';
 import LeaderboardTab from './LeaderboardTab';
 import BadgesTab from './BadgesTab';
 import MembersTab from './MembersTab';
 import ManageTab, { DeleteCommunitySection } from './ManageTab';
+import { playerProfilePath } from '../playerProfile';
 
 function formatDate(d) {
   if (!d) return 'Open-ended';
@@ -53,6 +55,7 @@ function ActiveChallengeCard({ group, isAdmin, onCreateChallenge }) {
 }
 
 function CommunityPanel({ group, isAdmin, currentUserId, onChanged, onDeleted, notify }) {
+  const navigate = useNavigate();
   const past = group.last_completed_challenge;
   const winnerIds = new Set((past?.winners || []).map((w) => w.user_id));
   const nonWinners = past ? group.members.filter((m) => !winnerIds.has(m.user_id)) : [];
@@ -111,7 +114,20 @@ function CommunityPanel({ group, isAdmin, currentUserId, onChanged, onDeleted, n
             </p>
             {past.winners.length > 0 ? (
               <p className="text-sm font-semibold mt-2">
-                Winner{past.winners.length > 1 ? 's' : ''}: {past.winners.map((w) => `${w.name} (${w.points} pts)`).join(', ')}
+                Winner{past.winners.length > 1 ? 's' : ''}:{' '}
+                {past.winners.map((w, i) => (
+                  <span key={w.user_id}>
+                    {i > 0 ? ', ' : ''}
+                    <button
+                      type="button"
+                      onClick={() => navigate(playerProfilePath(currentUserId, w.user_id, group.id))}
+                      className="fc-focus underline-offset-2 hover:underline"
+                    >
+                      {w.name}
+                    </button>
+                    {` (${w.points} pts)`}
+                  </span>
+                ))}
               </p>
             ) : (
               <p className="fc-text-dim text-sm mt-2">No points were logged, so no winner was crowned.</p>

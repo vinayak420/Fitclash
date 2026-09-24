@@ -223,3 +223,14 @@ class UserStats(BaseModel):
     group_count: int
     badge_count: int
     challenges_won: int
+
+
+class PublicUserProfile(BaseModel):
+    id: int
+    name: str
+    avatar_url: Optional[str] = None
+    weekly_points: int
+    streak: int
+    badge_count: int
+    challenges_won: int
+    badges: List[BadgeOut]

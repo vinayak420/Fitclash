@@ -17,12 +17,6 @@ function parseTaskPoints(value) {
   return n;
 }
 
-function parseTaskPoints(value) {
-  const n = Number(value);
-  if (!Number.isInteger(n) || n < -1000 || n > 1000) return null;
-  return n;
-}
-
 function StartChallengeForm({ group, onChanged }) {
   const [name, setName] = useState('');
   const [endDate, setEndDate] = useState('');

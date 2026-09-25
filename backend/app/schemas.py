@@ -234,3 +234,38 @@ class PublicUserProfile(BaseModel):
     badge_count: int
     challenges_won: int
     badges: List[BadgeOut]
+
+
+# ---------- Notifications ----------
+
+class PushSubscribeRequest(BaseModel):
+    endpoint: str = Field(min_length=8, max_length=1024)
+    keys: dict
+    user_agent: Optional[str] = Field(default=None, max_length=255)
+
+
+class PushConfigOut(BaseModel):
+    public_key: Optional[str] = None
+    configured: bool
+
+
+class NotificationOut(BaseModel):
+    id: int
+    type: str
+    title: str
+    body: str
+    challenge_id: Optional[int] = None
+    community_id: Optional[int] = None
+    actor_user_id: Optional[int] = None
+    reference_id: Optional[int] = None
+    link_path: Optional[str] = None
+    created_at: datetime
+    read_at: Optional[datetime] = None
+
+    class Config:
+        from_attributes = True
+
+
+class NotificationListOut(BaseModel):
+    items: List[NotificationOut]
+    unread_count: int

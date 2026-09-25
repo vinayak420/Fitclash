@@ -9,3 +9,5 @@ psycopg2-binary==2.9.10
 python-dotenv==1.2.1
 boto3==1.42.59
 pillow==12.1.1
+pywebpush==2.0.3
+tzdata==2025.2

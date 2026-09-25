@@ -146,9 +146,12 @@ def join_group(
         .filter(models.GroupMember.group_id == group.id, models.GroupMember.user_id == current_user.id)
         .first()
     )
-    if not existing:
+    is_new = existing is None
+    if is_new:
         db.add(models.GroupMember(group_id=group.id, user_id=current_user.id, role=models.RoleEnum.MEMBER))
         db.commit()
+        from ..notification_service import notify_community_join
+        notify_community_join(db, group, current_user)
 
     return _group_detail(db, group)
 
@@ -364,6 +367,8 @@ def start_challenge(
     db.add(challenge)
     db.commit()
     db.refresh(challenge)
+    from ..notification_service import notify_challenge_started
+    notify_challenge_started(db, challenge)
     return _challenge_out(challenge)
 
 
@@ -408,6 +413,9 @@ def end_challenge(
 
     db.commit()
     db.refresh(challenge)
+
+    from ..notification_service import notify_challenge_ended
+    notify_challenge_ended(db, challenge)
 
     users = db.query(models.User).filter(models.User.id.in_(member_ids)).all()
     users_by_id = {u.id: u for u in users}

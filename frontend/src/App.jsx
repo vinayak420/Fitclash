@@ -14,6 +14,7 @@ import CreateCommunityPage from './pages/CreateCommunityPage';
 import CommunitiesPage from './pages/CommunitiesPage';
 import CommunityDetailPage from './pages/CommunityDetailPage';
 import JoinCommunityPage from './pages/JoinCommunityPage';
+import NotificationsPage from './pages/NotificationsPage';
 
 function RequireAuth({ children }) {
   const { user, loading } = useAuth();
@@ -74,6 +75,7 @@ export default function App() {
               <Route path="/communities" element={<CommunitiesPage />} />
               <Route path="/communities/:id" element={<CommunityDetailPage />} />
               <Route path="/join" element={<JoinCommunityPage />} />
+              <Route path="/notifications" element={<NotificationsPage />} />
             </Route>
             <Route path="*" element={<Navigate to="/profile" replace />} />
           </Routes>

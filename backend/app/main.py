@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from .database import SessionLocal, ensure_schema
-from .routers import auth, groups, submissions, leaderboard, users
+from .routers import auth, groups, submissions, leaderboard, users, notifications, cron
 from .badge_service import seed_badges
 
 ensure_schema()
@@ -31,6 +31,8 @@ app.include_router(submissions.router)
 app.include_router(leaderboard.router)
 app.include_router(users.router)
 app.include_router(users.avatar_router)
+app.include_router(notifications.router)
+app.include_router(cron.router)
 
 
 @app.get("/health")

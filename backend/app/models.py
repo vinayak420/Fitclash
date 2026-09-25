@@ -3,7 +3,7 @@ import secrets
 from datetime import datetime, date
 
 from sqlalchemy import (
-    Column, Integer, String, ForeignKey, DateTime, Date, Boolean, Enum, UniqueConstraint,
+    Column, Integer, String, ForeignKey, DateTime, Date, Boolean, Enum, UniqueConstraint, Index,
 )
 from sqlalchemy.orm import relationship
 
@@ -176,3 +176,65 @@ class UserBadge(Base):
 
     user = relationship("User", back_populates="badges")
     badge = relationship("Badge")
+
+
+class NotificationType(str, enum.Enum):
+    CHALLENGE_INVITE = "CHALLENGE_INVITE"
+    COMMUNITY_JOIN = "COMMUNITY_JOIN"
+    BADGE_EARNED = "BADGE_EARNED"
+    LEADERBOARD_OVERTAKEN = "LEADERBOARD_OVERTAKEN"
+    CHALLENGE_STARTED = "CHALLENGE_STARTED"
+    CHALLENGE_ENDING_SOON = "CHALLENGE_ENDING_SOON"
+    CHALLENGE_ENDED = "CHALLENGE_ENDED"
+    POINTS_LOGGED = "POINTS_LOGGED"
+    DAILY_POINTS_REMINDER = "DAILY_POINTS_REMINDER"
+
+
+class Notification(Base):
+    __tablename__ = "notifications"
+    __table_args__ = (
+        UniqueConstraint("user_id", "event_key", name="uq_notification_user_event"),
+        Index("ix_notifications_user_created", "user_id", "created_at"),
+    )
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    type = Column(String(40), nullable=False)
+    title = Column(String(200), nullable=False)
+    body = Column(String(500), nullable=False)
+    event_key = Column(String(180), nullable=False)
+    challenge_id = Column(Integer, ForeignKey("challenges.id"), nullable=True)
+    community_id = Column(Integer, ForeignKey("groups.id"), nullable=True)
+    actor_user_id = Column(Integer, ForeignKey("users.id"), nullable=True)
+    reference_id = Column(Integer, nullable=True)
+    link_path = Column(String(255), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+    read_at = Column(DateTime, nullable=True)
+
+    user = relationship("User", foreign_keys=[user_id])
+
+
+class PushSubscription(Base):
+    __tablename__ = "push_subscriptions"
+    __table_args__ = (UniqueConstraint("endpoint", name="uq_push_endpoint"),)
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False, index=True)
+    endpoint = Column(String(1024), nullable=False)
+    p256dh = Column(String(255), nullable=False)
+    auth = Column(String(255), nullable=False)
+    user_agent = Column(String(255), nullable=True)
+    created_at = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    user = relationship("User")
+
+
+class NotificationPreference(Base):
+    """Per-type opt-out. Missing row means the type is enabled."""
+    __tablename__ = "notification_preferences"
+    __table_args__ = (UniqueConstraint("user_id", "type", name="uq_notification_pref_user_type"),)
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
+    type = Column(String(40), nullable=False)
+    enabled = Column(Boolean, default=True, nullable=False)

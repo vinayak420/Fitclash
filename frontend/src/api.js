@@ -97,4 +97,12 @@ export const api = {
     return data;
   },
   deleteAvatar: () => request('DELETE', '/auth/me/avatar'),
+
+  listNotifications: () => request('GET', '/notifications'),
+  unreadNotificationCount: () => request('GET', '/notifications/unread-count'),
+  markNotificationRead: (id) => request('POST', `/notifications/${id}/read`),
+  markAllNotificationsRead: () => request('POST', '/notifications/read-all'),
+  pushConfig: () => request('GET', '/notifications/push-config'),
+  subscribePush: (payload) => request('POST', '/notifications/subscribe', payload),
+  unsubscribePush: (payload) => request('DELETE', '/notifications/subscribe', payload),
 };

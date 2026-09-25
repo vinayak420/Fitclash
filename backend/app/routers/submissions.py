@@ -94,6 +94,27 @@ def submit_checklist(
     db.commit()
     db.refresh(sub)
 
-    evaluate_and_award_badges(db, current_user.id)
+    from ..notification_service import (
+        challenge_points_map,
+        notify_badges_earned,
+        notify_leaderboard_overtakes,
+        notify_points_logged,
+    )
+
+    before = {uid: pts for uid, pts in challenge_points_map(db, challenge).items()}
+    before[current_user.id] = before.get(current_user.id, 0) - sub.points_earned
+    after = challenge_points_map(db, challenge)
+    notify_leaderboard_overtakes(
+        db,
+        challenge=challenge,
+        actor=current_user,
+        before=before,
+        after=after,
+        on_date=sub.date,
+    )
+    notify_points_logged(db, current_user.id, sub, challenge)
+
+    awarded = evaluate_and_award_badges(db, current_user.id)
+    notify_badges_earned(db, current_user.id, awarded)
 
     return _submission_out(sub)

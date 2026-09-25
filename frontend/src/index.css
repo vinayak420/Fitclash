@@ -177,6 +177,30 @@ body {
   min-height: 100dvh;
   max-width: 32rem;
   margin: 0 auto;
+  position: relative;
+}
+
+.fc-app-topbar {
+  display: flex;
+  justify-content: flex-end;
+  padding: 0.5rem 0.75rem 0;
+}
+
+.fc-notif-badge {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  min-width: 16px;
+  height: 16px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--ember);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .fc-app-frame.has-tabs {

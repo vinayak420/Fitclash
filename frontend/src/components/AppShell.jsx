@@ -1,6 +1,7 @@
 import React from 'react';
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { User, UserPlus, Users } from 'lucide-react';
+import NotificationBell from './NotificationBell';
 
 const TABS = [
   { to: '/profile', label: 'Profile', icon: User },
@@ -15,6 +16,9 @@ export default function AppShell() {
   return (
     <div className="fc-app-shell">
       <div className={`fc-app-frame ${showTabs ? 'has-tabs' : ''}`}>
+        <div className="fc-app-topbar">
+          <NotificationBell />
+        </div>
         <main className="fc-app-main">
           <Outlet />
         </main>

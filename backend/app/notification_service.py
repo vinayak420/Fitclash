@@ -114,11 +114,17 @@ def create_notification(
     return row
 
 
-def send_web_push(db: Session, notification: models.Notification) -> None:
+def _vapid_settings():
     public_key = os.getenv("VAPID_PUBLIC_KEY", "").strip()
-    private_key = os.getenv("VAPID_PRIVATE_KEY", "").strip()
-    subject = os.getenv("VAPID_SUBJECT", "").strip()
-    if not public_key or not private_key or not subject:
+    private_key = os.getenv("VAPID_PRIVATE_KEY", "").strip().strip('"').strip("'")
+    private_key = private_key.replace("\\n", "\n")
+    subject = os.getenv("VAPID_SUBJECT", "").strip() or "mailto:fitclash@localhost"
+    return public_key, private_key, subject
+
+
+def send_web_push(db: Session, notification: models.Notification) -> None:
+    public_key, private_key, subject = _vapid_settings()
+    if not public_key or not private_key:
         return
     try:
         from pywebpush import WebPushException, webpush
@@ -136,6 +142,7 @@ def send_web_push(db: Session, notification: models.Notification) -> None:
         .filter(models.PushSubscription.user_id == notification.user_id)
         .all()
     )
+    stale = []
     for sub in subs:
         try:
             webpush(
@@ -146,14 +153,18 @@ def send_web_push(db: Session, notification: models.Notification) -> None:
                 data=payload,
                 vapid_private_key=private_key,
                 vapid_claims={"sub": subject},
+                ttl=86400,
             )
         except WebPushException as exc:
             status = getattr(getattr(exc, "response", None), "status_code", None)
             if status in (404, 410):
-                db.delete(sub)
-                db.commit()
+                stale.append(sub)
         except Exception:
             continue
+    for sub in stale:
+        db.delete(sub)
+    if stale:
+        db.commit()
 
 
 def notify_community_join(db: Session, group: models.Group, joiner: models.User) -> None:

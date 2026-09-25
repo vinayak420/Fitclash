@@ -1,0 +1,11 @@
+{
+  "name": "FitClash",
+  "short_name": "FitClash",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#EEEDF8",
+  "theme_color": "#7C5CFF",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

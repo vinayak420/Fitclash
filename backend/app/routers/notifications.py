@@ -33,6 +33,26 @@ def push_config():
     return schemas.PushConfigOut(public_key=public_key or None, configured=bool(public_key))
 
 
+@router.post("/test-push")
+def test_push(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user),
+):
+    from ..notification_service import create_notification
+    row = create_notification(
+        db,
+        user_id=current_user.id,
+        ntype=models.NotificationType.POINTS_LOGGED,
+        title="FitClash alerts are on",
+        body="You’ll see FitClash in this device’s notification panel.",
+        event_key=f"push_test:{current_user.id}:{int(datetime.utcnow().timestamp())}",
+        link_path="/notifications",
+    )
+    if row is None:
+        raise HTTPException(status_code=400, detail="Could not send a test notification.")
+    return {"status": "sent", "id": row.id}
+
+
 @router.get("", response_model=schemas.NotificationListOut)
 def list_notifications(
     unread_only: bool = Query(False),
